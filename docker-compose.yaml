@@ -1,0 +1,40 @@
+version: "3"
+
+#use container_name(s) to allow the services to connect to each other
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: react-app 
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+    networks:
+      - mern-networks
+
+  backend:
+    build: ./backend
+    container_name: node-api #used on the proxy (./frontend/package.json) - for development requests
+    ports:
+      - "5000:5000"
+    restart: always
+    depends_on:
+      - database
+    networks:
+      - mern-networks
+
+  database:
+    image: mongo
+    container_name: mongo-db #used in the mongodb connection string of the api (inside ./backend/server.js)
+    ports:
+      - "27017:27017"
+    networks:
+      - mern-networks
+    #can also create a volume to persist the data  
+
+networks:
+  mern-networks:
+    driver: bridge
